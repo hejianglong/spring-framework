@@ -138,4 +138,12 @@ public class XmlBeanDefinitionReaderTests {
 		assertNotNull(bean);
 	}
 
+	@Test
+	public void withIocLoadBeanDefinition() {
+		Resource resource = new ClassPathResource("test.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+	}
+
 }

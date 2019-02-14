@@ -81,6 +81,7 @@ import org.springframework.util.xml.DomUtils;
  * @since 2.0
  * @see ParserContext
  * @see DefaultBeanDefinitionDocumentReader
+ * 负责解析 BeanDefinition，定义解析 XML Element 的各种方法
  */
 public class BeanDefinitionParserDelegate {
 

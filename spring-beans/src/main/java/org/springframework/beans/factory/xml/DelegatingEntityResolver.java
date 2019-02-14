@@ -35,6 +35,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see BeansDtdResolver
  * @see PluggableSchemaResolver
+ * 代理了 BeansDtdResolver，PluggableSchemaResolver
  */
 public class DelegatingEntityResolver implements EntityResolver {
 
@@ -59,7 +60,9 @@ public class DelegatingEntityResolver implements EntityResolver {
 	 * (can be {@code null}) to use the default ClassLoader)
 	 */
 	public DelegatingEntityResolver(@Nullable ClassLoader classLoader) {
+		// Spring Bean dtd 解码器，用来从 classpath 或者 jar 文件中加载 dtd
 		this.dtdResolver = new BeansDtdResolver();
+		// 读取 META-INF/spring.schemas 成一个 namespaceURI 与 Schema 文件地址的 map
 		this.schemaResolver = new PluggableSchemaResolver(classLoader);
 	}
 
@@ -81,9 +84,11 @@ public class DelegatingEntityResolver implements EntityResolver {
 	@Nullable
 	public InputSource resolveEntity(String publicId, @Nullable String systemId) throws SAXException, IOException {
 		if (systemId != null) {
+			// dtd 模式
 			if (systemId.endsWith(DTD_SUFFIX)) {
 				return this.dtdResolver.resolveEntity(publicId, systemId);
 			}
+			// xsd 模式
 			else if (systemId.endsWith(XSD_SUFFIX)) {
 				return this.schemaResolver.resolveEntity(publicId, systemId);
 			}

@@ -88,15 +88,22 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
 			throws ParserConfigurationException {
 
+		// 创建 DocumentBuilderFactory
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		// 设置命名空间的支持
 		factory.setNamespaceAware(namespaceAware);
 
+		// 如果存在校验模式
 		if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
+			// 开启校验
 			factory.setValidating(true);
+			// 如果为 XSD 校验模式
 			if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {
 				// Enforce namespace aware for XSD...
+				// 在 XSD 模式下强制	命名空间支持
 				factory.setNamespaceAware(true);
 				try {
+					// 设置为 XSD_SCHEMA_LANGUAGE
 					factory.setAttribute(SCHEMA_LANGUAGE_ATTRIBUTE, XSD_SCHEMA_LANGUAGE);
 				}
 				catch (IllegalArgumentException ex) {
@@ -129,9 +136,11 @@ public class DefaultDocumentLoader implements DocumentLoader {
 			throws ParserConfigurationException {
 
 		DocumentBuilder docBuilder = factory.newDocumentBuilder();
+		// 设置解析器
 		if (entityResolver != null) {
 			docBuilder.setEntityResolver(entityResolver);
 		}
+		// 设置错误处理类
 		if (errorHandler != null) {
 			docBuilder.setErrorHandler(errorHandler);
 		}
