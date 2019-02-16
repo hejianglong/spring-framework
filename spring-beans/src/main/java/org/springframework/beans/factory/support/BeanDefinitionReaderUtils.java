@@ -53,11 +53,13 @@ public abstract class BeanDefinitionReaderUtils {
 	 * (can be {@code null} to just register bean classes by name)
 	 * @return the bean definition
 	 * @throws ClassNotFoundException if the bean class could not be loaded
+	 *
 	 */
 	public static AbstractBeanDefinition createBeanDefinition(
 			@Nullable String parentName, @Nullable String className, @Nullable ClassLoader classLoader) throws ClassNotFoundException {
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
+		// <bean parent= />
 		bd.setParentName(parentName);
 		if (className != null) {
 			if (classLoader != null) {

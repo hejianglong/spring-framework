@@ -24,12 +24,16 @@ import org.springframework.lang.Nullable;
  *
  * @author Juergen Hoeller
  * @since 2.0
+ *
+ *
  */
 public interface BeanMetadataElement {
 
 	/**
 	 * Return the configuration source {@code Object} for this metadata element
 	 * (may be {@code null}).
+	 *
+	 * Bean 元素对象持有的配置元素可以通过 getSource 来获取
 	 */
 	@Nullable
 	Object getSource();

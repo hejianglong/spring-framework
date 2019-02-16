@@ -26,6 +26,8 @@ import org.springframework.lang.Nullable;
  *
  * @author Juergen Hoeller
  * @since 2.5
+ *
+ *
  */
 @SuppressWarnings("serial")
 public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport implements BeanMetadataElement {
