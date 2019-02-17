@@ -4,11 +4,10 @@
 		xmlns:c="http://www.springframework.org/schema/c"
 		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
- <!--
 	<bean id="simple1" class="org.springframework.tests.sample.beans.DummyBean">
 		<constructor-arg value="name"/>
 	</bean>
- -->
+
 	<bean id="simple" class="org.springframework.tests.sample.beans.DummyBean" c:_="simple"/>
 
 <!--

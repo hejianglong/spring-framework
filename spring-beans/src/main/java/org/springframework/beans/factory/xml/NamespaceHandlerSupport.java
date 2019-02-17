@@ -70,7 +70,9 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	@Override
 	@Nullable
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 获取元素对应的 BeanDefinitionParser
 		BeanDefinitionParser parser = findParserForElement(element, parserContext);
+		// 进行解析
 		return (parser != null ? parser.parse(element, parserContext) : null);
 	}
 
@@ -80,6 +82,9 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 */
 	@Nullable
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
+		// 根据 element 获取对应的 localName，例如: <util:constant />，localName = "constant"
+		// 对应的值在创建对应的处理器的 init 方法已经创建好了，取出来对应的 Parser 即可
+		// constant -> ConstantBeanDefinitionParser
 		String localName = parserContext.getDelegate().getLocalName(element);
 		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {

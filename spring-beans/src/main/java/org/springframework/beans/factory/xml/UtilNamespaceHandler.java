@@ -47,6 +47,7 @@ public class UtilNamespaceHandler extends NamespaceHandlerSupport {
 
 	@Override
 	public void init() {
+		// 注册指定元素的 BeanDefinitionParser 的解析器
 		registerBeanDefinitionParser("constant", new ConstantBeanDefinitionParser());
 		registerBeanDefinitionParser("property-path", new PropertyPathBeanDefinitionParser());
 		registerBeanDefinitionParser("list", new ListBeanDefinitionParser());

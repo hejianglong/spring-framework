@@ -192,7 +192,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						parseDefaultElement(ele, delegate);
 					}
 					// 否则自定义解析
-					// 例如 <tx:annotation-driven>
+					// 例如 <tx:annotation-driven>，<util:constant /> ...
 					else {
 						delegate.parseCustomElement(ele);
 					}
@@ -353,7 +353,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// 失败返回 null
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
-			// 自定义标签的处理
+			// BeanDefinition 是否需要被装饰，需要的话进行装饰
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
 				// Register the final decorated instance.
