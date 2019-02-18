@@ -18,6 +18,7 @@ package org.springframework.beans.factory.xml;
 
 import java.util.Arrays;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.InputSource;
 
@@ -144,6 +145,8 @@ public class XmlBeanDefinitionReaderTests {
 		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 		beanDefinitionReader.loadBeanDefinitions(resource);
+		Object obj = beanFactory.getBean("myalias");
+		Assert.assertNotNull(obj);
 	}
 
 }

@@ -83,6 +83,11 @@ public abstract class BeanFactoryUtils {
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 			return name;
 		}
+		// computeIfAbsent 分为两种情况
+		// 1: 已经存在则直接返回
+		// 2: 不存在则进行计算执行，将结果添加到缓存
+		// 去除传入 name 的 & 前缀
+		// transformedBeanNameCache 是为了缓存转换后的结果，下次获取相同的 name 时候，直接返回缓存中的结果即可
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
 			do {
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
