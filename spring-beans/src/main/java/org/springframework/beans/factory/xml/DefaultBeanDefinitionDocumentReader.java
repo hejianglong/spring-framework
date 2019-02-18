@@ -179,7 +179,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
 		// 如果根节点使用默认命名空间，执行默认解析
-		// 例如 <bean id="studentService" class="org.springframework.core.StudentService" />
+		// 例如 <bean id="studentService" class="org.springframework.core.StudentService" />, <bean /> ...
 		if (delegate.isDefaultNamespace(root)) {
 			// 遍历子节点
 			NodeList nl = root.getChildNodes();
@@ -192,7 +192,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						parseDefaultElement(ele, delegate);
 					}
 					// 否则自定义解析
-					// 例如 <tx:annotation-driven>，<util:constant /> ...
+					// 例如 <util:constant /> ...
 					else {
 						delegate.parseCustomElement(ele);
 					}

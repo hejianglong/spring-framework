@@ -33,6 +33,7 @@ import org.springframework.beans.factory.parsing.ComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.tests.beans.CollectingReaderEventListener;
 import org.springframework.tests.sample.beans.CustomEnum;
 import org.springframework.tests.sample.beans.TestBean;
@@ -58,6 +59,15 @@ public class UtilNamespaceHandlerTests {
 		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(this.beanFactory);
 		reader.setEventListener(this.listener);
 		reader.loadBeanDefinitions(new ClassPathResource("testUtilNamespace.xml", getClass()));
+	}
+
+
+	@Test
+	public void withIocLoadBeanDefinition() {
+		Resource resource = new ClassPathResource("testUtilNamespace.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
+		reader.loadBeanDefinitions(resource);
 	}
 
 
