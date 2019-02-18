@@ -49,9 +49,13 @@ public class SimpleAliasRegistry implements AliasRegistry {
 
 	@Override
 	public void registerAlias(String name, String alias) {
+		// 校验 name 和 alias 不能为空
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
+		// 同步处理
 		synchronized (this.aliasMap) {
+			// 如果 alias 和 beanName 相同则移除 aliasMap 中的 alias
+			// 如果没有设置 bean#Name 属性的话默认会取第一个 alias 并且将其删除
 			if (alias.equals(name)) {
 				this.aliasMap.remove(alias);
 				if (logger.isDebugEnabled()) {
@@ -60,21 +64,27 @@ public class SimpleAliasRegistry implements AliasRegistry {
 			}
 			else {
 				String registeredName = this.aliasMap.get(alias);
+				// 如果 alias 已经注册
 				if (registeredName != null) {
+					// 如果 alias 已经注册并且 name 相同，那么无需重复注册
 					if (registeredName.equals(name)) {
 						// An existing alias - no need to re-register
 						return;
 					}
+					// 如果不允许覆盖则抛出异常
 					if (!allowAliasOverriding()) {
 						throw new IllegalStateException("Cannot define alias '" + alias + "' for name '" +
 								name + "': It is already registered for name '" + registeredName + "'.");
 					}
+					// 打印日志
 					if (logger.isDebugEnabled()) {
 						logger.debug("Overriding alias '" + alias + "' definition for registered name '" +
 								registeredName + "' with new target name '" + name + "'");
 					}
 				}
+				// 检查是否存在循环指向
 				checkForAliasCircle(name, alias);
+				// 注册 alias
 				this.aliasMap.put(alias, name);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Alias definition '" + alias + "' registered for name '" + name + "'");
