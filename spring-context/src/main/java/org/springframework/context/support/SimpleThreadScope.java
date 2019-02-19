@@ -71,7 +71,7 @@ public class SimpleThreadScope implements Scope {
 		Map<String, Object> scope = this.threadScope.get();
 		Object scopedObject = scope.get(name);
 		if (scopedObject == null) {
-			// 调用 createBean
+			// 回调方法
 			scopedObject = objectFactory.getObject();
 			scope.put(name, scopedObject);
 		}
