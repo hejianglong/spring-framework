@@ -385,12 +385,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					// It's a prototype -> create a new instance.
 					Object prototypeInstance = null;
 					try {
+						// 加载前置处理
 						beforePrototypeCreation(beanName);
+						// 创建 Bean 对象
 						prototypeInstance = createBean(beanName, mbd, args);
 					}
 					finally {
+						// 加载后置处理
 						afterPrototypeCreation(beanName);
 					}
+					// 从 Bean 实例中获取对象
 					bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
 				}
 
@@ -402,15 +406,20 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
 					}
 					try {
+						// 从指定的 scope 下创建 bean
+						// SimpleThreadScope#get
 						Object scopedInstance = scope.get(beanName, () -> {
+							// 加载前置处理
 							beforePrototypeCreation(beanName);
 							try {
 								return createBean(beanName, mbd, args);
 							}
+							// 加载后置处理
 							finally {
 								afterPrototypeCreation(beanName);
 							}
 						});
+						// 从 Bean 实例中获取对象
 						bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
 					}
 					catch (IllegalStateException ex) {
@@ -1102,16 +1111,21 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@SuppressWarnings("unchecked")
 	protected void beforePrototypeCreation(String beanName) {
+		// 原型模式
 		Object curVal = this.prototypesCurrentlyInCreation.get();
+		// 如果当前线程没有正在创建的原型 Bean，则直接加入 prototypesCurrentlyInCreation 标示其处于创建中
 		if (curVal == null) {
 			this.prototypesCurrentlyInCreation.set(beanName);
 		}
+		// 如果当前以及有一个 beanName 了，这当前是第二个
+		// 构建容量为 2 的集合放入 prototypesCurrentlyInCreation
 		else if (curVal instanceof String) {
 			Set<String> beanNameSet = new HashSet<>(2);
 			beanNameSet.add((String) curVal);
 			beanNameSet.add(beanName);
 			this.prototypesCurrentlyInCreation.set(beanNameSet);
 		}
+		// 如果当前有大于等于 2 个的原型 Bean 处于创建中，这直接加入创建集合
 		else {
 			Set<String> beanNameSet = (Set<String>) curVal;
 			beanNameSet.add(beanName);
@@ -1126,13 +1140,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@SuppressWarnings("unchecked")
 	protected void afterPrototypeCreation(String beanName) {
+		// 取出当前处于创建中的原型 Bean
 		Object curVal = this.prototypesCurrentlyInCreation.get();
+		// 如果只有一个的情况直接移除
 		if (curVal instanceof String) {
 			this.prototypesCurrentlyInCreation.remove();
 		}
+		// 如果处于创建中的原型 Bean 有多个这移除该 beanName
 		else if (curVal instanceof Set) {
 			Set<String> beanNameSet = (Set<String>) curVal;
 			beanNameSet.remove(beanName);
+			// 如果为空则将其删除
 			if (beanNameSet.isEmpty()) {
 				this.prototypesCurrentlyInCreation.remove();
 			}
@@ -1698,6 +1716,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Get the object for the given bean instance, either the bean
 	 * instance itself or its created object in case of a FactoryBean.
+	 * 这个方法主要是验证以下我们得到的 bean 的正确性，其实就是检查当前 bean 是否是 FactoryBean
+	 * 类型的 Bean，如果是则需要调用 bean 对应的 FactoryBean 的 getObject() 方法，作为返回值
+	 *
+	 * 无论是从缓存中获得 bean 还是不同的 scope 策略获取到的 bean 都只是最原始的状态
+	 * 并不一定就是我们最终要的 bean
 	 * @param beanInstance the shared bean instance
 	 * @param name name that may include factory dereference prefix
 	 * @param beanName the canonical bean name
