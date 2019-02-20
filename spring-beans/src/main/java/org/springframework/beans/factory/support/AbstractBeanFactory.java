@@ -1887,8 +1887,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * in case of a child definition.
 	 * <p>All bean retrieval methods delegate to this method for actual bean creation.
 	 * @param beanName the name of the bean
-	 * @param mbd the merged bean definition for the bean
-	 * @param args explicit arguments to use for constructor or factory method invocation
+	 * @param mbd the merged bean definition for the bean 已经合并了父类属性的 BeanDefinition
+	 * @param args explicit arguments to use for constructor or factory method invocation 用于构造函数或者工厂方法创建 bean 实例对象的参数
 	 * @return a new instance of the bean
 	 * @throws BeanCreationException if the bean could not be created
 	 */

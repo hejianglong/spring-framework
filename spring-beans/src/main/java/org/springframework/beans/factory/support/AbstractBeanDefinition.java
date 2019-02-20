@@ -160,6 +160,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
+	/**
+	 * 用于指定创建 bean 的回调，如果设置了回调那么其它构造器或者工厂方法都会失去作用
+	 */
 	@Nullable
 	private Supplier<?> instanceSupplier;
 
@@ -956,6 +959,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Return whether this bean definition is 'synthetic', that is,
 	 * not defined by the application itself.
+	 * 是不是应用程序本身定义的
 	 */
 	public boolean isSynthetic() {
 		return this.synthetic;
@@ -1071,10 +1075,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
 		// Check that lookup methods exists.
+		// 如果存在覆盖的方法
 		if (hasMethodOverrides()) {
 			Set<MethodOverride> overrides = getMethodOverrides().getOverrides();
+
+			// 取出并且做同步处理
 			synchronized (overrides) {
 				for (MethodOverride mo : overrides) {
+					// 校验每一个方法重写的正确性，以及是否存在重载
 					prepareMethodOverride(mo);
 				}
 			}
@@ -1082,6 +1090,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 校验每一个方法重写的正确性，以及是否存在重载
 	 * Validate and prepare the given method override.
 	 * Checks for existence of a method with the specified name,
 	 * marking it as not overloaded if none found.
@@ -1090,11 +1099,13 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
+		// 有重写方法但是得到的数量为 0 抛出异常
 		if (count == 0) {
 			throw new BeanDefinitionValidationException(
 					"Invalid method override: no method with name '" + mo.getMethodName() +
 					"' on class [" + getBeanClassName() + "]");
 		}
+		// 标记该方法没有被重写
 		else if (count == 1) {
 			// Mark override as not overloaded, to avoid the overhead of arg type checking.
 			mo.setOverloaded(false);
