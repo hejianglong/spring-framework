@@ -663,7 +663,7 @@ class ConstructorResolver {
 			if (explicitArgs == null && argsHolderToUse != null) {
 				mbd.factoryMethodToIntrospect = factoryMethodToUse;
 				// 将解析的构造函数，构造参数加入缓存
-				argsHolderToUse.storeCache(mbd, factoryMethodToUse);bw
+				argsHolderToUse.storeCache(mbd, factoryMethodToUse);
 			}
 		}
 
