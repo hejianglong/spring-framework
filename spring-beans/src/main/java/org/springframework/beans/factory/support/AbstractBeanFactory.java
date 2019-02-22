@@ -273,6 +273,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
+		// 如果 sharedInstance 不为 null，args 不为 null 则还是需要重新创建
 		// 从单列缓存中没有获取到 Bean 对象说明
 		// 要么该 Bean 对象不是单列的
 		// 要么该 Bean 对象还没有初始化完成

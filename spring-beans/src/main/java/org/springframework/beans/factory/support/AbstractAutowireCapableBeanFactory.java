@@ -1152,6 +1152,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 * Create a new instance for the specified bean, using an appropriate instantiation strategy:
 	 * factory method, constructor autowiring, or simple instantiation.
+	 * 选择合适实例化策略来为 bean 创建实例对象，具体的策略有：
+	 * Supplier 回调方式
+	 * 工厂方法初始化
+	 * 构造函数自动注入初始化
+	 * 默认构造函数注入
+	 * 其中工厂方法初始化和构造函数自动注入初始化两种方式最为复杂
+	 * 主要是因为构造函数和构造参数的不确定性，Spring 需要花大量的精力来确定构造函数和构造参数
+	 * 如果确定了就直接选择实例化策略即可
+	 * 在实例化的时候根据是否需要覆盖或者动态替换掉的方法
+	 * 因为存在覆盖或者织入的话需要创建动态代理方法织入这个时候就要寻找 cglib
+	 * 的方式来实例化，否则直接利用反射的方式即可，方便快捷
 	 * @param beanName the name of the bean
 	 * @param mbd the bean definition for the bean
 	 * @param args explicit arguments to use for constructor or factory method invocation
@@ -1189,8 +1200,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean autowireNecessary = false;
 		if (args == null) {
 			synchronized (mbd.constructorArgumentLock) {
-				// 如果已换成的解析的够着函数或者工厂方法不为空，则可以利用构造函数解析
-				// 因为需要格局参数缺到底使用哪个构造函数，该过程比较消耗性能，所以采用缓存机制
+				// 如果已换成的解析的构造函数或者工厂方法不为空，则可以利用构造函数解析
+				// 因为需要确定到底使用哪个构造函数，该过程比较消耗性能，所以采用缓存机制
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
 					resolved = true;
 					autowireNecessary = mbd.constructorArgumentsResolved;
@@ -1199,12 +1210,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		// 已经解析好了，直接注入即可
 		if (resolved) {
-			// autowire 自动注入，调用构造函数自动注入
+			// 参数已经解析 autowire 自动注入，调用构造函数自动注入
 			if (autowireNecessary) {
+				// 可以理解带有参数的构造方法
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
-				// 使用默认构造函数构造
+				// 使用默认构造函数解析构造
 				return instantiateBean(beanName, mbd);
 			}
 		}
@@ -1330,6 +1342,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			Object beanInstance;
 			final BeanFactory parent = this;
 			if (System.getSecurityManager() != null) {
+				// getInstantiationStrategy() 获取实例化 Bean 策略 InstantiationStrategy 对象
 				beanInstance = AccessController.doPrivileged((PrivilegedAction<Object>) () ->
 						getInstantiationStrategy().instantiate(mbd, beanName, parent),
 						getAccessControlContext());
