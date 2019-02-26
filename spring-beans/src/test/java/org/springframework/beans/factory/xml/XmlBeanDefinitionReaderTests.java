@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.xml.sax.InputSource;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -145,7 +146,7 @@ public class XmlBeanDefinitionReaderTests {
 		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 		beanDefinitionReader.loadBeanDefinitions(resource);
-		Object obj = beanFactory.getBean("myalias");
+		Object obj = beanFactory.getBean("factoryReferencer");
 		Assert.assertNotNull(obj);
 	}
 

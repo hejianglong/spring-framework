@@ -436,10 +436,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param dependentBeanName the name of the dependent bean
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+		// 获取 beanName 真实名称
 		String canonicalName = canonicalName(beanName);
 
 		// dependentBeanMap
 		// key: canonicalName, value: dependentBeans
+		// 放入依赖中
 		synchronized (this.dependentBeanMap) {
 			Set<String> dependentBeans =
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
@@ -450,6 +452,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 		// dependenciesForBeanMap
 		// key: dependentBeanName, value: canonicalName
+		// 依赖的 beanName 的 bean 增加当前的对象
 		synchronized (this.dependenciesForBeanMap) {
 			Set<String> dependenciesForBean =
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
