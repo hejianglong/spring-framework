@@ -146,7 +146,42 @@ public class XmlBeanDefinitionReaderTests {
 		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 		beanDefinitionReader.loadBeanDefinitions(resource);
-		Object obj = beanFactory.getBean("factoryReferencer");
+		Object obj = beanFactory.getBean("validEmptyWithDescription");
+		Assert.assertNotNull(obj);
+	}
+
+	/**
+	 * 解决单列实例循环依赖问题
+	 * 只能解决 filed 注入的方式
+	 * 构造器注入不能解决原型模式也不能解决
+	 *
+	 * AbstractBeanFactory#createBean
+	 * -> AbstractAutowireCapableBeanFactory#doCreateBean
+	 * -> AbstractAutowireCapableBeanFactory#addSingletonFactory
+	 * 关键处 this.singletonFactories.put(beanName, singletonFactory);
+	 * 当 Bean A 在此处加入到 singletonFactories 中
+	 * -> AbstractAutowireCapableBeanFactory#populateBean(beanName, mbd, instanceWrapper); 进行属性赋值
+	 * -> AbstractAutowireCapableBeanFactory#applyPropertyValues(beanName, mbd, bw, pvs); 将之前获取到的属性进行注入到实例属性上
+	 * Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue); 这段代码会将取出的 Bean b 的值转换成 IOC 容器
+	 * 中对应的引用赋值给当前字段，意味着需要去实例化 Bean B
+	 * 如果是 RuntimeBeanReference 然后调用 resolveReference(argName, ref);
+	 * 然后调用 bean = this.beanFactory.getBean(refName); 此处回去先实列化 B 对象
+	 * 然后调用回到 AbstractBeanFactory，Object sharedInstance = getSingleton(beanName);
+	 * 此处从 singletonFactories 取出值 ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+	 * singletonObject = singletonFactory.getObject();
+	 * this.earlySingletonObjects.put(beanName, singletonObject);
+	 * 此处返回不为 null 经过 bean = getObjectForBeanInstance(sharedInstance, name, beanName, null); 来完成实例化 Bean
+	 * 后方法直接返回走后续流程
+	 * 到达后续循环依赖处理 if (earlySingletonExposure) { ... }
+	 *
+	 */
+	@Test
+	public void withIocCircularDepend() {
+		Resource resource = new ClassPathResource("test.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+		Object obj = beanFactory.getBean("a");
 		Assert.assertNotNull(obj);
 	}
 

@@ -200,6 +200,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		// 从单列缓冲中加载 bean
 		Object singletonObject = this.singletonObjects.get(beanName);
 		// 缓存中不存在对应的 bean 并且当前 bean 正在创建
+		// bean 正在创建说明，bean 在初始化但是还没有完成初始化
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
 				// 从 earlySingletonObjects 中取出早期创建的 bean 实例
