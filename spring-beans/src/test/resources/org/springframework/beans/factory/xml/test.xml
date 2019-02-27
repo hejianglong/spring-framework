@@ -13,6 +13,8 @@
 
 	<bean id="myApplicationAware" class="org.springframework.tests.sample.beans.test.MyApplicationAware" />
 
+	<bean id="beanPostProcessorTest" class="org.springframework.tests.sample.beans.test.BeanPostProcessorTest" />
+
 	<bean id="validEmptyWithDescription" class="org.springframework.tests.sample.beans.TestBean">
 		<description>
 			I have no properties and I'm happy without them.

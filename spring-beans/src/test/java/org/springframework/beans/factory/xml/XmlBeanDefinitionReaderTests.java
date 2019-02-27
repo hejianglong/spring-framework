@@ -21,6 +21,7 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.tests.sample.beans.test.BeanPostProcessorTest;
 import org.xml.sax.InputSource;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -199,6 +200,34 @@ public class XmlBeanDefinitionReaderTests {
 		beanDefinitionReader.loadBeanDefinitions(resource);
 		Object obj = beanFactory.getBean("myApplicationAware");
 		Assert.assertNotNull(obj);
+	}
+
+	/**
+	 * BeanPostProcessor
+	 * 会在调用 AbstractAutowireCapableBeanFactory#initializeBean() 初始化方法中调用
+	 * 在 bean 实例化后
+	 * 初始化前、后调用
+	 * 一般的 BeanFactory 不支持自动注册 BeanPostProcessor 需要我们手动调用
+	 * 如果我们需要 bean 进行一些配置，增加一些自己的逻辑，那么请使用 BeanPostProcessor
+	 * 通过设置了 BeanPostProcessor 在对应的时机回调，它是 Spring 提供的对象实例化阶段强有力的拓展点
+	 * 允许 Spring 在实例化(初始化阶段)对其进行定制化修改，
+	 * 比较常见的使用场景是处理标记接口实现类或者为当前对象提供代理实现（例如 AOP）
+	 * addBeanPostProcessor() 方法进行注册，注册后的 BeanPostProcessor 适用于所有该 BeanFactory 创建的 bean
+	 *
+	 * 但是 ApplicationContext 可以在其 bean 定义中自动检测所有的 BeanPostProcessor 并自动完成注册，
+	 * 同时将他们应用到随后创建的任何的 Bean 中
+	 * 它其中的 BeanPostProcessor 可以进行排序，而 BeanFactoryProcessor 中的顺序只和加入的顺序有关
+	 * 实例化 bean -> 激活 Aware -> BeanPostProcessor 前置处理 -> 初始化 bean -> BeanPostProcessor 后置处理
+	 */
+	@Test
+	public void testIocBeanPostProcessor() {
+		Resource resource = new ClassPathResource("test.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+		beanFactory.addBeanPostProcessor(new BeanPostProcessorTest());
+		BeanPostProcessorTest beanPostProcessorTest = (BeanPostProcessorTest) beanFactory.getBean("beanPostProcessorTest");
+		Assert.assertNotNull(beanPostProcessorTest);
 	}
 
 }
