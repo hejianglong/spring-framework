@@ -15,6 +15,14 @@
 
 	<bean id="beanPostProcessorTest" class="org.springframework.tests.sample.beans.test.BeanPostProcessorTest" />
 
+	<bean id="initializingBeanTest" class="org.springframework.tests.sample.beans.test.InitializingBeanTest">
+		<property name="name" value="hello - 1" />
+	</bean>
+
+	<bean id="initializingBeanTest2" class="org.springframework.tests.sample.beans.test.InitializingBeanTest" init-method="setOtherName">
+		<property name="name" value="hello - 1" />
+	</bean>
+
 	<bean id="validEmptyWithDescription" class="org.springframework.tests.sample.beans.TestBean">
 		<description>
 			I have no properties and I'm happy without them.

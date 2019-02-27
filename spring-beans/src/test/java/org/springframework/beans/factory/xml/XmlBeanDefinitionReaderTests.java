@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.tests.sample.beans.test.BeanPostProcessorTest;
+import org.springframework.tests.sample.beans.test.InitializingBeanTest;
 import org.xml.sax.InputSource;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -228,6 +229,51 @@ public class XmlBeanDefinitionReaderTests {
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorTest());
 		BeanPostProcessorTest beanPostProcessorTest = (BeanPostProcessorTest) beanFactory.getBean("beanPostProcessorTest");
 		Assert.assertNotNull(beanPostProcessorTest);
+	}
+
+	/**
+	 * 在完成 bean 的实例化后，并且调用了对应的 Aware 注入后
+	 * 然后调用了 BeanPostProcessor 前置处理器后，接着会检验当前 bean 对象是否实现了
+	 * InitializingBean 接口，如果是则会调用 afterPropertiesSet() 方法进一步调整 bean 实例对象的状态
+	 * AbstractAutowireCapableBeanFactory#invokeInitMethods
+	 *
+	 * 在这个示例中 afterPropertiesSet() 改变了原有 bean 属性值
+	 * 这相当于 Spring 容器又给我提供了一种可改变 bean 实例对象的方法
+	 *
+	 * 然后再检查是否置顶了 init-method，如果指定了则通过反射机制调用指定的 init-method  方法
+	 *
+	 * Spring 的一个核心理念就是无侵入性，但是如果我们的业务类实现了这个接口就显得 Spring 容器
+	 * 具有侵入性了。所以 Spring 还提供了另外一个种实现的方式：init-method 方法
+	 * @see testIocInitMethod()
+	 */
+	@Test
+	public void testIocInitializingBean() {
+		Resource resource = new ClassPathResource("test.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+		beanFactory.addBeanPostProcessor(new BeanPostProcessorTest());
+		InitializingBeanTest initializingBeanTest = (InitializingBeanTest) beanFactory.getBean("initializingBeanTest");
+		Assert.assertEquals("hello - 2", initializingBeanTest.getName());
+	}
+
+	/**
+	 * 和 testIocInitializingBean 触发的时间一样不过
+	 * AbstractAutowireCapableBeanFactory#invokeInitMethods
+	 * 先回去调用 afterPropertiesSet() 后回去调用 init-method
+	 * 这样就可以无侵入性的实现 bean 实例对象初始化的定制化了
+	 * 同时可以使用 <beans> 标签的 default-init-method 来统一指定初始化方法
+	 */
+	@Test
+	public void testIocInitMethod() {
+		Resource resource = new ClassPathResource("test.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+		beanFactory.addBeanPostProcessor(new BeanPostProcessorTest());
+		InitializingBeanTest initializingBeanTest = (InitializingBeanTest) beanFactory.getBean("initializingBeanTest2");
+		Assert.assertEquals("hello - 3", initializingBeanTest.getName());
+
 	}
 
 }
