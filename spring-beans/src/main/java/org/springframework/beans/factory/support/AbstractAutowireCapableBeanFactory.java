@@ -1403,6 +1403,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param beanName the name of the bean
 	 * @param mbd the bean definition for the bean
 	 * @param bw the BeanWrapper with bean instance
+	 *
 	 */
 	@SuppressWarnings("deprecation")  // for postProcessPropertyValues
 	protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
@@ -1889,6 +1890,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		else {
 			// 激活 Aware 方法，对特殊的 bean 处理 BeanNameAware、BeanClassLoaderAware、BeanFactoryAware
+			// 调用对应的 setXxx() 方法注入对应的值
 			invokeAwareMethods(beanName, bean);
 		}
 

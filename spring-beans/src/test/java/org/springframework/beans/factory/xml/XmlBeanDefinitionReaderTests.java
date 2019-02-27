@@ -185,4 +185,20 @@ public class XmlBeanDefinitionReaderTests {
 		Assert.assertNotNull(obj);
 	}
 
+	/**
+	 * 在 Bean 属性填充赋值之后
+	 * 调用初始化方法之前（InitializingBean#afterPropertiesSet()，init-method）
+	 * 其实就是 Spring 容器检测到当前 bean 是否实现了 Aware 接口
+	 * 然后看其具体实现的接口依次调用 setXxx() 方法设置 BeanName、BeanClassLoader、BeanFactory
+	 */
+	@Test
+	public void testIocAware() {
+		Resource resource = new ClassPathResource("test.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+		Object obj = beanFactory.getBean("myApplicationAware");
+		Assert.assertNotNull(obj);
+	}
+
 }
