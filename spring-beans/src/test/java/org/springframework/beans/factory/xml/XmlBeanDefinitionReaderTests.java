@@ -18,12 +18,12 @@ package org.springframework.beans.factory.xml;
 
 import java.util.Arrays;
 
+import org.apache.catalina.core.ApplicationContext;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.tests.sample.beans.test.BeanPostProcessorTest;
-import org.springframework.tests.sample.beans.test.Car;
-import org.springframework.tests.sample.beans.test.InitializingBeanTest;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.tests.sample.beans.test.*;
 import org.xml.sax.InputSource;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -316,4 +316,33 @@ public class XmlBeanDefinitionReaderTests {
 
 	}
 
+	/**
+	 * 用于容器启动阶段，允许我们在容器实例化 Bean 之前对注册到该容器的 BeanDefinition 做出修改
+	 *
+	 * 采用 ApplicationContext 就无需手动 postProcessBeanFactory(beanFactory)
+	 * 因为他会自动识别配置文件中的 BeanFactoryPostProcessor，并且完成注册和调用，而 BeanFactory 就不行
+	 * 一般情况下无需主动去自定义 BeanFactoryPostProcessor，Spring 提供了几个常用的 BeanFactoryPostProcessor
+	 * PropertyPlaceholderConfigurer、PropertyOverrideConfigurer
+	 * PropertyPlaceholderConfigurer：允许我们在 XML 文件中使用占位符并将这些占位符所代表的资源单独配置到简单的
+	 * properties 文件来加载。
+	 * PropertyOverrideConfigurer：允许我们使用占位符来明确 bean 定义中的 property 与 properties 文件中的各配置
+	 * 之间的对应关系，这两个类在大型项目中非常重要
+	 */
+	@Test
+	public void testBeanFactoryPostProcessor() {
+		Resource resource = new ClassPathResource("spring_1.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+		beanFactory.addBeanPostProcessor(new BeanPostProcessorTest());
+
+		BeanFactoryPostProcessorOne one = new BeanFactoryPostProcessorOne();
+		BeanFactoryPostProcessorTwo two = new BeanFactoryPostProcessorTwo();
+		one.postProcessBeanFactory(beanFactory);
+		two.postProcessBeanFactory(beanFactory);
+
+		// ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring_1.xml", getClass());
+		StudentService studentService = (StudentService) beanFactory.getBean("studentService");
+		Assert.assertNotNull(studentService);
+	}
 }

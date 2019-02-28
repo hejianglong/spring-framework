@@ -50,6 +50,11 @@ public interface BeanFactoryPostProcessor {
 	 * initialization. All bean definitions will have been loaded, but no beans
 	 * will have been instantiated yet. This allows for overriding or adding
 	 * properties even to eager-initializing beans.
+	 * 表示方法的作用：在 standard initialization 之后（就是已经完成了 BeanDefinition 的加载）对 bean factory 容器进行修改
+	 * 表示作用的时机：所有的 BeanDefinition 已经完成了加载加载到了 BeanFactory 中，但是还没有完成初始化
+	 *
+	 * 工作与 BeanDefinition 加载完成之后，Bean 实例化之前，其主要作用是对加载 BeanDefinition 进行修改
+	 * 千万不能进行 Bean 的实例化操作，这样会导致过早实例化产生严重的后果
 	 * @param beanFactory the bean factory used by the application context
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 */
