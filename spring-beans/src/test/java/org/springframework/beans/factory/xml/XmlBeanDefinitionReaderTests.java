@@ -18,13 +18,8 @@ package org.springframework.beans.factory.xml;
 
 import java.util.Arrays;
 
-import org.apache.catalina.core.ApplicationContext;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.tests.sample.beans.test.*;
 import org.xml.sax.InputSource;
 

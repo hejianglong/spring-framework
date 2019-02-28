@@ -170,9 +170,13 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 	 */
 	public MutablePropertyValues addPropertyValue(PropertyValue pv) {
 		for (int i = 0; i < this.propertyValueList.size(); i++) {
+			// 取出原始属性值
 			PropertyValue currentPv = this.propertyValueList.get(i);
+			// 如果不相同再进行覆盖，免得做无用操作
 			if (currentPv.getName().equals(pv.getName())) {
+				// 合并属性
 				pv = mergeIfRequired(pv, currentPv);
+				// 设置属性值原有的属性值在此刻被覆盖
 				setPropertyValueAt(pv, i);
 				return this;
 			}
@@ -220,6 +224,7 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
 	 * @see Mergeable
 	 */
 	private PropertyValue mergeIfRequired(PropertyValue newPv, PropertyValue currentPv) {
+		// 取出配置文件中的值准备进行合并
 		Object value = newPv.getValue();
 		if (value instanceof Mergeable) {
 			Mergeable mergeable = (Mergeable) value;

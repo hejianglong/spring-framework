@@ -7,6 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.tests.sample.beans.test.StudentService;
 
 public class BeanTest {
+
 	/**
 	 * PropertyPlaceholderConfigurer 的用法
 	 *
@@ -25,6 +26,18 @@ public class BeanTest {
 		ApplicationContext context = new ClassPathXmlApplicationContext("spring_2.xml");
 
 		StudentService studentService = (StudentService) context.getBean("studentService");
+		System.out.println(studentService.getName());
+		Assert.assertNotNull(studentService);
+	}
+
+	/**
+	 * 可以通过 PropertyOverrideConfigurer 来覆盖任何 bean 中的任何属性
+	 */
+	@Test
+	public void testPropertyOverrideConfigurer() {
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring_3.xml");
+
+		StudentService studentService = (StudentService) context.getBean("student");
 		System.out.println(studentService.getName());
 		Assert.assertNotNull(studentService);
 	}
