@@ -508,13 +508,13 @@ class ConstructorResolver {
 			Method[] rawCandidates = getCandidateMethods(factoryClass, mbd);
 			List<Method> candidateList = new ArrayList<>();
 			for (Method candidate : rawCandidates) {
-				// 如果存在静态的工厂方法则添加到 candidateList 中等待检测
+				// 如果存在工厂方法则添加到 candidateList 中等待检测
 				if (Modifier.isStatic(candidate.getModifiers()) == isStatic && mbd.isFactoryMethod(candidate)) {
 					candidateList.add(candidate);
 				}
 			}
 
-			// 如果得到的静态工厂方法只有一个并且参数为 null 并且不存在构造函数值
+			// 如果得到的工厂方法只有一个并且参数为 null 并且不存在构造函数值
 			// 这直接调用默认空构造函数创建对象并且返回
 			// TODO hejianglong 待确定
 			if (candidateList.size() == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
@@ -561,6 +561,8 @@ class ConstructorResolver {
 					resolvedValues = new ConstructorArgumentValues();
 					// 解析构造函数的参数
 					// 将该 bean 的构造函数参数解析为 resolvedValues 对象，其中会涉及到其他的 bean
+					// 并且将配置的属性值注入到 resolvedValues 中
+					// 例如 <constructor-arg value="BMW"></constructor-arg>， 其中持有一个 ValueHolder value = "BMW"
 					// 返回解析到的个数
 					// TODO hejianglong 待分析
 					minNrOfArgs = resolveConstructorArguments(beanName, mbd, bw, cargs, resolvedValues);

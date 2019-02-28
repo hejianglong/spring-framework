@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.tests.sample.beans.test.BeanPostProcessorTest;
+import org.springframework.tests.sample.beans.test.Car;
 import org.springframework.tests.sample.beans.test.InitializingBeanTest;
 import org.xml.sax.InputSource;
 
@@ -273,7 +274,28 @@ public class XmlBeanDefinitionReaderTests {
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorTest());
 		InitializingBeanTest initializingBeanTest = (InitializingBeanTest) beanFactory.getBean("initializingBeanTest2");
 		Assert.assertEquals("hello - 3", initializingBeanTest.getName());
+	}
 
+	/**
+	 * 实例工厂方法获取 Bean
+	 * 首先获取 car 实例的时候会 this.beanFactory.getBean(factoryBeanName); 获取对应的 factoryBean 如果不在 IOC 容器中需要递归加载
+	 * 初次加载缓存中未获取到会进行嗅探以确定对应的工厂方法
+	 * Modifier.isStatic(candidate.getModifiers()) 并不是意味着必须是静态方法，实例工厂方法一样返回了检测到的工厂方法
+	 * 此处为 getCar(name)。
+	 * 然后解析出参数的个数以及对应的值，待确认的工厂方法构造出 ArgumentsHolder
+	 * 最后利用反射创建 Bean 对象放入 BeanWrapper 中
+	 *
+	 * 实例工厂方法基本上类似，只是说无需 this.beanFactory.getBean(factoryBeanName)，只要存在对应的类即可
+	 */
+	@Test
+	public void testIocInstanceFactoryMethod() {
+		Resource resource = new ClassPathResource("test.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+		beanFactory.addBeanPostProcessor(new BeanPostProcessorTest());
+		Car car = (Car) beanFactory.getBean("car");
+		System.out.println(car);
 	}
 
 }

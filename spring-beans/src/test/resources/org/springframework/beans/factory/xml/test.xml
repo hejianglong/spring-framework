@@ -23,6 +23,12 @@
 		<property name="name" value="hello - 1" />
 	</bean>
 
+	<bean id="carFactory" class="org.springframework.tests.sample.beans.test.InstanceCarFactory" />
+
+	<bean id="car" factory-bean="carFactory" factory-method="getCar">
+		<constructor-arg value="BMW"></constructor-arg>
+	</bean>
+
 	<bean id="validEmptyWithDescription" class="org.springframework.tests.sample.beans.TestBean">
 		<description>
 			I have no properties and I'm happy without them.
