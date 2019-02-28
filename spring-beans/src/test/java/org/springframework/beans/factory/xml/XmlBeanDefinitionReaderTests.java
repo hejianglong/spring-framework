@@ -298,4 +298,22 @@ public class XmlBeanDefinitionReaderTests {
 		System.out.println(car);
 	}
 
+	/**
+	 * bean 的生命周期
+	 * 1. Spring 容器根据实例化策略实例化 Bean 对象
+	 * 2. 看是否实现了 Aware 接口，包括 BeanNameAware，BeanClassLoaderAware，BeanFactoryAware 调用其 setXxx 将其设置到实现类中
+	 * 3. 调用 BeanPostProcessor#postProcessBeforeInitialization(Object bean, String beanName) 前置处理器，完成 bean 的前置处理
+	 * 4. 然后看是否实现了 InitializingBean 接口，调用其 afterPropertiesSet() 方法设置值
+	 * 5. 看起是否定义了 init-method 方法，有的话就调用
+	 * 6. 调用 BeanPostProcessor#postProcessAfterInitialization(Object bean, String beanName) 后置处理器，完成 bean 的后置处理
+	 * 对象完成了初始化
+	 * 7. 在容器关闭前看是否实现了 DisposableBean 接口，有这调用 destroy() 方法
+	 * 8. 在容器进行关闭之前，如果 bean 配置了 destroy-method 则调用其指定的方法
+	 * bean 的生命周期终结
+	 */
+	@Test
+	public void testBeanLife() {
+
+	}
+
 }
