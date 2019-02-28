@@ -124,6 +124,13 @@ public class PropertyPlaceholderHelper {
 		return parseStringValue(value, placeholderResolver, new HashSet<>());
 	}
 
+	/**
+	 * TODO - hejianglong 替换具体实现详情分析
+	 * @param value
+	 * @param placeholderResolver
+	 * @param visitedPlaceholders
+	 * @return
+	 */
 	protected String parseStringValue(
 			String value, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
 

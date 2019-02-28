@@ -23,6 +23,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.tests.sample.beans.test.*;
 import org.xml.sax.InputSource;
 
@@ -324,12 +326,13 @@ public class XmlBeanDefinitionReaderTests {
 	 * 一般情况下无需主动去自定义 BeanFactoryPostProcessor，Spring 提供了几个常用的 BeanFactoryPostProcessor
 	 * PropertyPlaceholderConfigurer、PropertyOverrideConfigurer
 	 * PropertyPlaceholderConfigurer：允许我们在 XML 文件中使用占位符并将这些占位符所代表的资源单独配置到简单的
-	 * properties 文件来加载。
+	 * properties 文件来加载，允许我们用 Properties 文件中的属性，来定义应用上下文（配置文件或者注解）。
 	 * PropertyOverrideConfigurer：允许我们使用占位符来明确 bean 定义中的 property 与 properties 文件中的各配置
 	 * 之间的对应关系，这两个类在大型项目中非常重要
 	 */
 	@Test
 	public void testBeanFactoryPostProcessor() {
+
 		Resource resource = new ClassPathResource("spring_1.xml", getClass());
 		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
@@ -345,4 +348,5 @@ public class XmlBeanDefinitionReaderTests {
 		StudentService studentService = (StudentService) beanFactory.getBean("studentService");
 		Assert.assertNotNull(studentService);
 	}
+
 }

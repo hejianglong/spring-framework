@@ -77,12 +77,17 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		try {
+			// 返回合并的 Properties 实例
+			// 调用子类实现的 loadProperties 进行合并，此处得到的结果就是合并后的值
 			Properties mergedProps = mergeProperties();
 
 			// Convert the merged properties, if necessary.
+			// 可以调用子类转换合并属性，将原始值替换成真正的值，如果没有子类实现默认返回原值
 			convertProperties(mergedProps);
 
 			// Let the subclass process the properties.
+			// 子类处理
+			// 替换过程的真正处理 PropertyPlaceholderConfigurer#processProperties
 			processProperties(beanFactory, mergedProps);
 		}
 		catch (IOException ex) {
@@ -103,6 +108,8 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 		while (propertyNames.hasMoreElements()) {
 			String propertyName = (String) propertyNames.nextElement();
 			String propertyValue = props.getProperty(propertyName);
+			// 进行一个值的转换
+			// 子类可以进行覆盖用以转换值，默认返回原值
 			String convertedValue = convertProperty(propertyName, propertyValue);
 			if (!ObjectUtils.nullSafeEquals(propertyValue, convertedValue)) {
 				props.setProperty(propertyName, convertedValue);

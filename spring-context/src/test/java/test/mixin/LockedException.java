@@ -17,6 +17,8 @@
 package test.mixin;
 
 
+import org.springframework.context.ApplicationContext;
+
 @SuppressWarnings("serial")
 public class LockedException extends RuntimeException {
 
