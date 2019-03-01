@@ -65,4 +65,13 @@ public class BeanTest {
 		System.out.println(student);
 		Assert.assertNotNull(student);
 	}
+
+	/**
+	 * BeanWrapper 主要继承三个核心接口 PropertyAccessor、PropertyEditorRegistry、TypeConverter
+	 * 它作为 BeanDefinition 向 Bean 转换过程中间产物，承载 Bean 实例的包装、类型转换、属性的设置以及访问等重要作用
+	 */
+	@Test
+	public void testBeanWrapper() {
+
+	}
 }

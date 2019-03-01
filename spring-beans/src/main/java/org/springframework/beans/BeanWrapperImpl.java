@@ -31,6 +31,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * BeanWrapper 接口的默认实现，用于对 Bean 的包装，实现上面接口所定义的功能
+ * 很简单包括设置获取被包装的对象，获取被包装的 bean 的属性描述器
  * Default {@link BeanWrapper} implementation that should be sufficient
  * for all typical use cases. Caches introspection results for efficiency.
  *
