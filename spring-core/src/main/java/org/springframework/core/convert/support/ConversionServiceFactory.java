@@ -41,6 +41,8 @@ public final class ConversionServiceFactory {
 
 	/**
 	 * Register the given Converter objects with the given target ConverterRegistry.
+	 * 在初始化阶段注册对应的 ConversionService
+	 * 此处将自定义的 ConversionService 放入 converters 中
 	 * @param converters the converter objects: implementing {@link Converter},
 	 * {@link ConverterFactory}, or {@link GenericConverter}
 	 * @param registry the target registry

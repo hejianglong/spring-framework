@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.tests.sample.beans.test.Student;
 import org.springframework.tests.sample.beans.test.StudentService;
 
 public class BeanTest {
@@ -40,5 +41,28 @@ public class BeanTest {
 		StudentService studentService = (StudentService) context.getBean("student");
 		System.out.println(studentService.getName());
 		Assert.assertNotNull(studentService);
+	}
+
+	/**
+	 * ConversionService 是 Spring 类型转换器体系中的核心接口，它定义了是否可以完成转换与类型转换两类接口方法
+	 *
+	 * 如何自定义类型转换器
+	 * 1. 实现 Converter / GenericConverter / ConverterFactory 接口
+	 * 2. 将该类注册到 ConversionServiceFactoryBean 中
+	 *
+	 * ConversionServiceFactoryBean 实现了 InitializingBean 接口实现 #afterPropertiesSet() 方法
+	 * 它会在实例化 Bean 完成调用 Aware 接口和 BeanPostProcessor 前置处理器后调用
+	 * 此处会设置好我们配置的自定义类型转换器放入 GenericConversionService 的 converters 中
+	 *
+	 * 当我们实列化对应的类对其注入属性值的时候，例如 student
+	 * 会从 converters 取出自定义的类型转换器然后调用其 convert 方法，放入 Student 的 PropertyValue 中的 convertValue 中
+	 * 来完成属性值的类型转换及注入
+	 */
+	@Test
+	public void testConversion() {
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring_4.xml");
+		Student student = (Student) context.getBean("student");
+		System.out.println(student);
+		Assert.assertNotNull(student);
 	}
 }

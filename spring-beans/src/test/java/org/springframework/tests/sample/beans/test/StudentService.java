@@ -21,4 +21,12 @@ public class StudentService {
 	public void setAge(int age) {
 		this.age = age;
 	}
+
+	@Override
+	public String toString() {
+		return "StudentService{" +
+				"name='" + name + '\'' +
+				", age=" + age +
+				'}';
+	}
 }
