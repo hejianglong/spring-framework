@@ -150,6 +150,21 @@ public class XmlBeanDefinitionReaderTests {
 		Assert.assertNotNull(obj);
 	}
 
+	@Test
+	public void testLookUpMethod() {
+		Resource resource = new ClassPathResource("test.xml", getClass());
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+		beanDefinitionReader.loadBeanDefinitions(resource);
+		Display display = (Display) beanFactory.getBean("display");
+		// 此处调用 CGLIB display() 方法
+		// getCar() 被拦截然后通过配置的 Lookup-method 找出对应的 beanName 根据
+		// 参数返回应该被实复写的对象
+		// CglibSubclassingInstantiationStrategy#LookupOverrideMethodInterceptor#intercept
+		display.display();
+		Assert.assertNotNull(display);
+	}
+
 	/**
 	 * 解决单列实例循环依赖问题
 	 * 只能解决 filed 注入的方式

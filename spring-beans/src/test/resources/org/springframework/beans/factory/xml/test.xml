@@ -29,6 +29,12 @@
 		<constructor-arg value="BMW"></constructor-arg>
 	</bean>
 
+	<bean id="hongqi" class="org.springframework.tests.sample.beans.test.Hongqi" />
+
+	<bean id="display" class="org.springframework.tests.sample.beans.test.Display">
+		<lookup-method name="getCar" bean="hongqi" />
+	</bean>
+
 	<bean id="validEmptyWithDescription" class="org.springframework.tests.sample.beans.TestBean">
 		<description>
 			I have no properties and I'm happy without them.
