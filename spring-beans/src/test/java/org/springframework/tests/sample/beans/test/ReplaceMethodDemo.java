@@ -11,7 +11,7 @@
  * disclose such Confidential Information and shall use it only in
  * accordance with the terms of the license.
  */
-package org.springframework.beans.factory.xml.example;
+package org.springframework.tests.sample.beans.test;
 
 import org.springframework.beans.factory.support.MethodReplacer;
 

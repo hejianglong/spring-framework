@@ -551,6 +551,7 @@ public class BeanDefinitionParserDelegate {
 			// 解析 <meta />
 			parseMetaElements(ele, bd);
 			// 解析 lookup-method 属性 <lookup-method />
+			// 并将其复写的方法放入 BeanDefinition 中
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			// 解析 replaced-method 属性 <replaced-method />
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
@@ -782,13 +783,16 @@ public class BeanDefinitionParserDelegate {
 	 * 根据 <lookup-method .. /> name 和 bean 构造一个 LookupOverride 对象放入 MethodOverrides 中
 	 */
 	public void parseLookupOverrideSubElements(Element beanEle, MethodOverrides overrides) {
+		// 取出所有子节点遍历
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 判断是 lookup-method 方法并且是默认的空间文档对象
 			if (isCandidateElement(node) && nodeNameEquals(node, LOOKUP_METHOD_ELEMENT)) {
 				Element ele = (Element) node;
 				String methodName = ele.getAttribute(NAME_ATTRIBUTE);
 				String beanRef = ele.getAttribute(BEAN_ELEMENT);
+				// 构造 LookupOverride 放入 overrides 中
 				LookupOverride override = new LookupOverride(methodName, beanRef);
 				override.setSource(extractSource(ele));
 				overrides.addOverride(override);

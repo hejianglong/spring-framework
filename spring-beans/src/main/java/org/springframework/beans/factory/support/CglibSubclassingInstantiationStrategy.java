@@ -115,10 +115,10 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		 * @return new instance of the dynamically generated subclass
 		 */
 		public Object instantiate(@Nullable Constructor<?> ctor, Object... args) {
-			// 通过 cglib 创建一个代理类
+			// 为提供 BeanDefinition 提供的 bean 通过 cglib 创建一个代理类
 			Class<?> subclass = createEnhancedSubclass(this.beanDefinition);
 			Object instance;
-			// 没有构造器，通过 BeanUtils 使用默认的构造器常见一个 bean 实例
+			// 没有指定构造器，通过 BeanUtils 使用默认的构造器创建一个 CGLIB bean 实例
 			if (ctor == null) {
 				instance = BeanUtils.instantiateClass(subclass);
 			}
@@ -149,12 +149,16 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		 */
 		private Class<?> createEnhancedSubclass(RootBeanDefinition beanDefinition) {
 			Enhancer enhancer = new Enhancer();
+			// 设置 Bean 类
 			enhancer.setSuperclass(beanDefinition.getBeanClass());
+			// 设置 Spring 的命名策略
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
+			// 设置生成策略
 			if (this.owner instanceof ConfigurableBeanFactory) {
 				ClassLoader cl = ((ConfigurableBeanFactory) this.owner).getBeanClassLoader();
 				enhancer.setStrategy(new ClassLoaderAwareGeneratorStrategy(cl));
 			}
+			// 过滤，自定义逻辑来指定调用的 callback 下标
 			enhancer.setCallbackFilter(new MethodOverrideCallbackFilter(beanDefinition));
 			enhancer.setCallbackTypes(CALLBACK_TYPES);
 			return enhancer.createClass();
@@ -240,6 +244,10 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 
 
 	/**
+	 * 是用来定义 CGLIB 回调过滤方法的拦截器行为，它继承 CglibIdentitySupport 实现了 CallbackFilter 接口
+	 * CallbackFilter 是 CGLIB 的一个回调过滤器
+	 * CglibIdentitySupport 则为 CGLIB 提供 #hashCode() 和 #equals(Object o) 方法，确保 CGLIB 不会
+	 * 为每个 Bean 生成不同的类
 	 * CGLIB callback for filtering method interception behavior.
 	 */
 	private static class MethodOverrideCallbackFilter extends CglibIdentitySupport implements CallbackFilter {
@@ -287,10 +295,15 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		@Override
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy mp) throws Throwable {
 			// Cast is safe, as CallbackFilter filters are used selectively.
+			// 获得 method 对应的 LookupOverride 对象
 			LookupOverride lo = (LookupOverride) getBeanDefinition().getMethodOverrides().getOverride(method);
 			Assert.state(lo != null, "LookupOverride not found");
+			// 获得参数
 			Object[] argsToUse = (args.length > 0 ? args : null);  // if no-arg, don't insist on args at all
 			if (StringUtils.hasText(lo.getBeanName())) {
+				// 通过 LookupOverride 获取对应的 beanName
+				// 然后通过 BeanFactory 获取对应的对象并且返回
+				// 后续注入值就完成了相应的操作
 				return (argsToUse != null ? this.owner.getBean(lo.getBeanName(), argsToUse) :
 						this.owner.getBean(lo.getBeanName()));
 			}
