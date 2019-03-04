@@ -74,4 +74,18 @@ public class BeanTest {
 	public void testBeanWrapper() {
 
 	}
+
+	/**
+	 *  PropertyResolver 体系结构
+	 *  ConfigurablePropertyResolver：提供属性类型转换的功能
+	 *  就 Properties 体系而言，PropertyResolver 定义了访问 Properties 属性值的方法，而 ConfigurablePropertyResolver
+	 *  则定义了解析 Properties 一些相关的规则和值进行类型转换所需要的 Service
+	 *  AbstractPropertyResolver：解析属性文件的抽象基类
+	 *  PropertySourcesPropertyResolver：PropertyResolver 的实现者，它对一组 PropertySources
+	 *  提供属性解析服务
+	 */
+	@Test
+	public void testProfile() {
+
+	}
 }

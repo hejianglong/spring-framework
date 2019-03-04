@@ -20,6 +20,7 @@ import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.lang.Nullable;
 
 /**
+ * 提供属性类型转换的功能
  * Configuration interface to be implemented by most if not all {@link PropertyResolver}
  * types. Provides facilities for accessing and customizing the
  * {@link org.springframework.core.convert.ConversionService ConversionService}
@@ -31,6 +32,7 @@ import org.springframework.lang.Nullable;
 public interface ConfigurablePropertyResolver extends PropertyResolver {
 
 	/**
+	 * 返回执行类型转换时使用的 ConfigurableConversionService
 	 * Return the {@link ConfigurableConversionService} used when performing type
 	 * conversions on properties.
 	 * <p>The configurable nature of the returned conversion service allows for
@@ -58,6 +60,7 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
 	void setConversionService(ConfigurableConversionService conversionService);
 
 	/**
+	 * 设置站位前缀
 	 * Set the prefix that placeholders replaced by this resolver must begin with.
 	 */
 	void setPlaceholderPrefix(String placeholderPrefix);
@@ -67,7 +70,7 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
 	 */
 	void setPlaceholderSuffix(String placeholderSuffix);
 
-	/**
+	/**设置占位符与默认值之间的分隔符
 	 * Specify the separating character between the placeholders replaced by this
 	 * resolver and their associated default value, or {@code null} if no such
 	 * special character should be processed as a value separator.
@@ -88,12 +91,14 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
 	void setIgnoreUnresolvableNestedPlaceholders(boolean ignoreUnresolvableNestedPlaceholders);
 
 	/**
+	 * 指定必须存在哪些属性，以便由 validateRequiredProperties() 验证
 	 * Specify which properties must be present, to be verified by
 	 * {@link #validateRequiredProperties()}.
 	 */
 	void setRequiredProperties(String... requiredProperties);
 
 	/**
+	 * 验证 setRequiredProperties 指定的每个属性是否存在并解析为非 Null 值
 	 * Validate that each of the properties specified by
 	 * {@link #setRequiredProperties} is present and resolves to a
 	 * non-{@code null} value.
