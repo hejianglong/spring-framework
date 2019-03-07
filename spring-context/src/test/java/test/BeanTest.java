@@ -88,4 +88,12 @@ public class BeanTest {
 	public void testProfile() {
 
 	}
+
+	@Test
+	public void testApplicationRefresh() {
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring_2.xml");
+		StudentService studentService = (StudentService) context.getBean("studentService");
+		System.out.println(studentService);
+		Assert.assertNotNull(studentService);
+	}
 }
