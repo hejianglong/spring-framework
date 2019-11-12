@@ -51,7 +51,20 @@ final class PostProcessorRegistrationDelegate {
 	private PostProcessorRegistrationDelegate() {
 	}
 
-
+	/**
+	 * 按顺序调用
+	 * 先调用方法手动添加的 BeanDefinitionRegistryPostProcessor
+	 * 然后调用实现了 PriorityOrdered 的对其进行排序后的 BeanDefinitionRegistryPostProcessor
+	 * 然后调用实现了 Ordered 的对其进行排序后的 BeanDefinitionRegistryPostProcessor
+	 * 然后调用其它的 BeanDefinitionRegistryPostProcessor
+	 *
+	 * 先调用方法手动添加的 BeanFactoryPostProcessor
+	 * 然后调用实现了 PriorityOrdered 的对其进行排序后的 BeanFactoryPostProcessor
+	 * 然后调用实现了 Ordered 的对其进行排序后的 BeanFactoryPostProcessor
+	 * 然后调用实现了没有实现 PriorityOrdered 或者 Ordered 的对顺序没有要求的 BeanFactoryPostProcessor
+	 * @param beanFactory
+	 * @param beanFactoryPostProcessors
+	 */
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
@@ -67,6 +80,7 @@ final class PostProcessorRegistrationDelegate {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
+					// 先调用手动添加的 BeanFactoryPostProcessor
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryProcessors.add(registryProcessor);
 				}
@@ -90,8 +104,10 @@ final class PostProcessorRegistrationDelegate {
 					processedBeans.add(ppName);
 				}
 			}
+			// 排序
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
+			// 再调用容器中实现 PriorityOrdered 接口的 BeanDefinitionRegistryPostProcessor
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 
@@ -105,11 +121,13 @@ final class PostProcessorRegistrationDelegate {
 			}
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
+			// 再调用容器中实现了 Ordered 接口的 BeanDefinitionRegistryPostProcessor
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 
 			// Finally, invoke all other BeanDefinitionRegistryPostProcessors until no further ones appear.
 			boolean reiterate = true;
+			// 然后循环调用容器中剩下的所有的 BeanDefinitionRegistryPostProcessor
 			while (reiterate) {
 				reiterate = false;
 				postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
@@ -127,7 +145,9 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
+			// 目前 registryProcessors 已经包含了所有的已经注册的类型为 BeanDefinitionRegistryPostProcessor 的 BD, 然后可以对其进行最后一次修改操作
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
+			// 调用手动添加的 BeanFactoryPostProcessor 对非 BeanDefinitionRegistryPostProcessor 类型的进行最后一次修改操作
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}
 
@@ -136,6 +156,8 @@ final class PostProcessorRegistrationDelegate {
 			invokeBeanFactoryPostProcessors(beanFactoryPostProcessors, beanFactory);
 		}
 
+		// 后续和上面类似再调用实现了 PriorityOrdered 和 Ordered 接口的 BeanFactoryPostProcessor 来修改 BD
+		// 最后调用没有实现 PriorityOrdered 和 Ordered 的 BeanFactoryPostProcessor 及无需关心顺序
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let the bean factory post-processors apply to them!
 		String[] postProcessorNames =
@@ -185,6 +207,14 @@ final class PostProcessorRegistrationDelegate {
 		beanFactory.clearMetadataCache();
 	}
 
+	/**
+	 * 从 beanFactory 中解析出所有 BeanPostProcessor
+	 * 然后按照 PriorityOrdered、Ordered、nonOrdered（没有顺序）进行排序依次注入到 beanFactory 中
+	 * 存储到对应的 CopyOnWriteArrayList 中
+	 *
+	 * @param beanFactory
+	 * @param applicationContext
+	 */
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 

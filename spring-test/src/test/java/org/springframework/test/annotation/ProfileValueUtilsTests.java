@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.annotation.test.TestA;
 
 import static org.junit.Assert.*;
 

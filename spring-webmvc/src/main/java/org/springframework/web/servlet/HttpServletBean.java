@@ -70,7 +70,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * <p>The {@link FrameworkServlet} class is a more specific servlet base
  * class which loads its own application context. FrameworkServlet serves
  * as direct base class of Spring's full-fledged {@link DispatcherServlet}.
- *
+ * 负责将 ServletConfig 设置到当前 Servlet 对象中
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see #addRequiredProperty
@@ -87,6 +87,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	@Nullable
 	private ConfigurableEnvironment environment;
 
+	// 必须配置的属性的集合
 	private final Set<String> requiredProperties = new HashSet<>(4);
 
 
@@ -107,6 +108,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	 * Set the {@code Environment} that this servlet runs in.
 	 * <p>Any environment set here overrides the {@link StandardServletEnvironment}
 	 * provided by default.
+	 * 实现 EnvironmentAware 接口，自动注入
 	 * @throws IllegalArgumentException if environment is not assignable to
 	 * {@code ConfigurableEnvironment}
 	 */
@@ -120,9 +122,11 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	 * Return the {@link Environment} associated with this servlet.
 	 * <p>If none specified, a default environment will be initialized via
 	 * {@link #createEnvironment()}.
+	 * 实现自 EnvironmentCapable 接口
 	 */
 	@Override
 	public ConfigurableEnvironment getEnvironment() {
+		// 如果 environment 为空，主动创建
 		if (this.environment == null) {
 			this.environment = createEnvironment();
 		}
@@ -148,13 +152,18 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	public final void init() throws ServletException {
 
 		// Set bean properties from init parameters.
+		// 解析 <init-param /> 标签，封装到 PropertyValues 中
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
 			try {
+				// 将当前的这个 Servlet 对象，转化成一个 BeanWrapper 对象
+				// 从而能够以 Spring 的方式来将 pvs 注入到该 BeanWrapper 对象中
 				BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 				ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
 				bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
+				// 留给子类实现
 				initBeanWrapper(bw);
+				// 以 Spring 的方式将 pvs 注入到该 BeanWrapper
 				bw.setPropertyValues(pvs, true);
 			}
 			catch (BeansException ex) {
@@ -166,6 +175,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		}
 
 		// Let subclasses do whatever initialization they like.
+		// 子类来实现，实现自定义的初始化逻辑
 		initServletBean();
 	}
 
